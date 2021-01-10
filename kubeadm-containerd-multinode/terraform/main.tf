@@ -211,10 +211,9 @@ resource "azurerm_linux_virtual_machine_scale_set" "node" {
   }
 
   custom_data = base64encode(data.template_file.node_script.rendered)
-
+# on mac os x, use: `sed -i '' -e`; on linux, use simply `sed -i` 
   provisioner "local-exec" {
-    command = "chmod 0600 ./sshkey ; scp -i ./sshkey -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  ${var.admin_username}@${azurerm_public_ip.controller.fqdn}:/.kube/config kube.config; sed -i 's/${azurerm_linux_virtual_machine.controller.private_ip_address}/${azurerm_public_ip.controller.fqdn}/g' /kube.config"
+    command = "chmod 0600 sshkey ; scp -i sshkey -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  ${var.admin_username}@${azurerm_public_ip.controller.fqdn}:/.kube/config kube.config >/dev/null 2>&1 && sed -i '' -e 's/${azurerm_linux_virtual_machine.controller.private_ip_address}/${azurerm_public_ip.controller.fqdn}/g' kube.config; rm sshkey"
   }
-
 }
 
