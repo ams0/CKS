@@ -1,4 +1,4 @@
-.terraform.lock.hcl
+kubeadm-containerd-multinode/terraform/.terraform.tfstate.lock.info
 kube.config
 sshkey
 *.dll
@@ -35,4 +35,3 @@ website/vendor
 # Test exclusions
 !command/test-fixtures/**/*.tfstate
 !command/test-fixtures/**/.terraform/
-
