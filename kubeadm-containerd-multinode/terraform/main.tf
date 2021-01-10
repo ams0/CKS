@@ -167,14 +167,14 @@ resource "azurerm_linux_virtual_machine" "controller" {
 resource "null_resource" "previous" {}
 
 
-resource "time_sleep" "wait_6_minutes" {
+resource "time_sleep" "wait_3_minutes" {
   depends_on = [null_resource.previous]
 
-  create_duration = "360s"
+  create_duration = "180s"
 }
 
 resource "azurerm_linux_virtual_machine_scale_set" "node" {
-  depends_on          = [time_sleep.wait_6_minutes, local_file.sshkey]
+  depends_on          = [time_sleep.wait_3_minutes, local_file.sshkey]
   name                = "nodes"
   resource_group_name = azurerm_resource_group.cks.name
   location            = azurerm_resource_group.cks.location
@@ -213,7 +213,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "node" {
   custom_data = base64encode(data.template_file.node_script.rendered)
 # on mac os x, use: `sed -i '' -e`; on linux, use simply `sed -i` 
   provisioner "local-exec" {
-    command = "chmod 0600 sshkey ; scp -i sshkey -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  ${var.admin_username}@${azurerm_public_ip.controller.fqdn}:/.kube/config kube.config >/dev/null 2>&1 && sed -i '' -e 's/${azurerm_linux_virtual_machine.controller.private_ip_address}/${azurerm_public_ip.controller.fqdn}/g' kube.config; rm sshkey"
+    command = "chmod 0600 sshkey ; scp -i sshkey -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  ${var.admin_username}@${azurerm_public_ip.controller.fqdn}:/.kube/config kube.config >/dev/null 2>&1 && sed -i '' -e 's/${azurerm_linux_virtual_machine.controller.private_ip_address}/${azurerm_public_ip.controller.fqdn}/g' kube.config"
   }
 }
 
